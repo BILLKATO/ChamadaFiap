@@ -1,4 +1,7 @@
+using AutoMapper;
 using ChamadaFiap;
+using ChamadaFiap.Dto;
+using ChamadaFiap.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -16,6 +19,7 @@ var connection = builder.Configuration
     .GetConnectionString("AZURE_CONNECTION_STRING2");
 
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connection));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
@@ -31,11 +35,39 @@ app.UseHttpsRedirection();
 
 app.MapGet(
     "/chamadas",
-    (MyDbContext context, int professor, int turma) =>
-    context.ClassPeriods
-        .Include(classPeriod => classPeriod.Class).ThenInclude(_class => _class.Team)
-        .Include(classPeriod => classPeriod.Class).ThenInclude(_class => _class.Subject)
-        .Where(classPeriod => classPeriod.Class.TeacherId == professor && classPeriod.Class.TeamId == turma).ToList()
+    (MyDbContext context, IMapper mapper, int professor, int turma) =>
+    {
+        return mapper.Map<List<ReadClassPeriodDto>>(context.ClassPeriods
+            .Include(classPeriod => classPeriod.Class).ThenInclude(_class => _class.Team)
+            .Include(classPeriod => classPeriod.Class).ThenInclude(_class => _class.Subject)
+            .Where(classPeriod => 
+                classPeriod.Class.TeacherId == professor && 
+                classPeriod.Class.TeamId == turma &&
+                classPeriod.StartTime.Date >= DateTime.Now.Date
+           ).ToList());
+    }
+).WithOpenApi();
+
+app.MapGet(
+    "/alunos",
+    (MyDbContext context, IMapper mapper, int turma) =>
+    {
+        return mapper.Map<List<ReadStudentDto>>(context.Students
+            .Where(student =>
+                student.TeamId == turma
+           ).ToList());
+    }
+).WithOpenApi();
+
+app.MapGet(
+    "/courseSyllabus",
+    (MyDbContext context, IMapper mapper, int classPeriod) =>
+    {
+        return mapper.Map<List<ReadStudentDto>>(context.CourseSyllabuses
+            .Where(courseSyllabus =>
+                courseSyllabus.ClassPeriodId == classPeriod
+           ).ToList());
+    }
 ).WithOpenApi();
 
 app.Run();

@@ -12,6 +12,9 @@ namespace RecrutamentoApi.Dados
                 .HasOne(classPeriod => classPeriod.Class)
                 .WithMany(_class => _class.ClassPeriods)
                 .HasForeignKey(classPeriod => classPeriod.ClassId);
+
+            builder.
+                Ignore(classPeriod => classPeriod.IsCourseSyllabusOk);                
         }
     }
 }
