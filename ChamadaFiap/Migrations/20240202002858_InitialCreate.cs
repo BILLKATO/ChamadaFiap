@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChamadaFiap.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Attendances",
+                name: "AttendanceTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -23,7 +23,7 @@ namespace ChamadaFiap.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Attendances", x => x.Id);
+                    table.PrimaryKey("PK_AttendanceTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,46 +40,32 @@ namespace ChamadaFiap.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CourseSyllabuses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CourseSyllabuses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Teachers",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Teachers", x => x.ID);
+                    table.PrimaryKey("PK_Teachers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Subjects",
                 columns: table => new
                 {
-                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subjects", x => x.SubjectId);
+                    table.PrimaryKey("PK_Subjects", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Subjects_Courses_CourseId",
                         column: x => x.CourseId,
@@ -94,10 +80,10 @@ namespace ChamadaFiap.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Start = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Finish = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Finish = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CourseId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,25 +102,29 @@ namespace ChamadaFiap.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    SubjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Classes_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Classes_Teachers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Classes_Teams_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Teams",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -143,9 +133,9 @@ namespace ChamadaFiap.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TeamId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegisterEnrollment = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RegisterEnrollment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -164,10 +154,9 @@ namespace ChamadaFiap.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CourseSyllabusId = table.Column<int>(type: "int", nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FinishTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    FinishTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ClassId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,45 +167,59 @@ namespace ChamadaFiap.Migrations
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClassPeriods_CourseSyllabuses_CourseSyllabusId",
-                        column: x => x.CourseSyllabusId,
-                        principalTable: "CourseSyllabuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentClasses",
+                name: "Attendances",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClassId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    AttendanceId = table.Column<int>(type: "int", nullable: false),
                     Start = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Finish = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Finish = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ClassPeriodId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    AttendanceTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentClasses", x => x.Id);
+                    table.PrimaryKey("PK_Attendances", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudentClasses_Attendances_AttendanceId",
-                        column: x => x.AttendanceId,
-                        principalTable: "Attendances",
+                        name: "FK_Attendances_AttendanceTypes_AttendanceTypeId",
+                        column: x => x.AttendanceTypeId,
+                        principalTable: "AttendanceTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StudentClasses_Classes_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "Classes",
+                        name: "FK_Attendances_ClassPeriods_ClassPeriodId",
+                        column: x => x.ClassPeriodId,
+                        principalTable: "ClassPeriods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StudentClasses_Students_StudentId",
+                        name: "FK_Attendances_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CourseSyllabuses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClassPeriodId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseSyllabuses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CourseSyllabuses_ClassPeriods_ClassPeriodId",
+                        column: x => x.ClassPeriodId,
+                        principalTable: "ClassPeriods",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -229,6 +232,82 @@ namespace ChamadaFiap.Migrations
                     { 1, "Arquitetura e Desenvolvimento .Net" },
                     { 2, "Banco de Dados" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Teachers",
+                columns: new[] { "Id", "Email", "Name" },
+                values: new object[,]
+                {
+                    { 1, "ricardo@fiap.com.br", "Ricardo" },
+                    { 2, "girafales@fiap.com.br", "Girafales" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Subjects",
+                columns: new[] { "Id", "CourseId", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, 1, "Fundamentos da Cyber Seguranca", "Fundamentos da Cyber Seguranca" },
+                    { 2, 1, "Arquitetura de Banco de Dados", "Arquitetura de Banco de Dados" },
+                    { 4, 2, "Arquitetura de Banco de Dados", "Arquitetura de Banco de Dados" },
+                    { 5, 2, "Fundamentos da Cyber Seguranca", "Fundamentos da Cyber Seguranca" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Teams",
+                columns: new[] { "Id", "CourseId", "Finish", "Name", "Start" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2025, 1, 26, 21, 28, 58, 279, DateTimeKind.Local).AddTicks(2887), "2NETR", new DateTime(2024, 2, 1, 21, 28, 58, 279, DateTimeKind.Local).AddTicks(2871) },
+                    { 2, 2, new DateTime(2025, 1, 26, 21, 28, 58, 279, DateTimeKind.Local).AddTicks(2895), "1NETR", new DateTime(2024, 2, 1, 21, 28, 58, 279, DateTimeKind.Local).AddTicks(2895) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Classes",
+                columns: new[] { "Id", "Name", "SubjectId", "TeacherId", "TeamId" },
+                values: new object[,]
+                {
+                    { 1, "Aula1", 1, 1, 1 },
+                    { 2, "Aula2", 2, 2, 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Students",
+                columns: new[] { "Id", "Name", "RegisterEnrollment", "TeamId" },
+                values: new object[,]
+                {
+                    { 1, "Gabriel", "RM643234", 1 },
+                    { 2, "Fernando", "RM644564", 2 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ClassPeriods",
+                columns: new[] { "Id", "ClassId", "FinishTime", "StartTime" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 2, 2, 0, 28, 58, 279, DateTimeKind.Local).AddTicks(3065), new DateTime(2024, 2, 1, 21, 28, 58, 279, DateTimeKind.Local).AddTicks(3063) },
+                    { 2, 1, new DateTime(2024, 2, 2, 3, 28, 58, 279, DateTimeKind.Local).AddTicks(3085), new DateTime(2024, 2, 2, 0, 28, 58, 279, DateTimeKind.Local).AddTicks(3084) }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_AttendanceTypeId",
+                table: "Attendances",
+                column: "AttendanceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_ClassPeriodId",
+                table: "Attendances",
+                column: "ClassPeriodId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attendances_StudentId",
+                table: "Attendances",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classes_SubjectId",
+                table: "Classes",
+                column: "SubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_TeacherId",
@@ -246,24 +325,9 @@ namespace ChamadaFiap.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassPeriods_CourseSyllabusId",
-                table: "ClassPeriods",
-                column: "CourseSyllabusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentClasses_AttendanceId",
-                table: "StudentClasses",
-                column: "AttendanceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentClasses_ClassId",
-                table: "StudentClasses",
-                column: "ClassId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentClasses_StudentId",
-                table: "StudentClasses",
-                column: "StudentId");
+                name: "IX_CourseSyllabuses_ClassPeriodId",
+                table: "CourseSyllabuses",
+                column: "ClassPeriodId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_TeamId",
@@ -285,25 +349,25 @@ namespace ChamadaFiap.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ClassPeriods");
-
-            migrationBuilder.DropTable(
-                name: "StudentClasses");
-
-            migrationBuilder.DropTable(
-                name: "Subjects");
+                name: "Attendances");
 
             migrationBuilder.DropTable(
                 name: "CourseSyllabuses");
 
             migrationBuilder.DropTable(
-                name: "Attendances");
+                name: "AttendanceTypes");
+
+            migrationBuilder.DropTable(
+                name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "ClassPeriods");
 
             migrationBuilder.DropTable(
                 name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "Teachers");

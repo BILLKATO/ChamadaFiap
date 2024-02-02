@@ -7,10 +7,9 @@ public class Subject
 {
     [Key]
     public int Id { get; set; }
-    public int CourseId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-
-    [ForeignKey("CourseId")]
     public virtual Course Course { get; set; }
+    public int CourseId { get; set; }
+    public virtual ICollection<Class>? Classes { get; set; }
 }
