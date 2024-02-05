@@ -16,7 +16,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 
 
 var connection = builder.Configuration
-    .GetConnectionString("AZURE_CONNECTION_STRING2");
+    .GetConnectionString("AZURE_CONNECTION_STRING");
 
 builder.Services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
